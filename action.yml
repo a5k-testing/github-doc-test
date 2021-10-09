@@ -15,7 +15,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "Checkout Documentation generator"
+    - name: "Checkout shdoc"
       uses: actions/checkout@v2
       with:
         repository: "reconquest/shdoc"
@@ -27,10 +27,9 @@ runs:
         # Compiling shdoc...
         action_path="${{ github.action_path }}"
         rm -rf "${action_path?}/shdoc"
-        #mv -f 'external_files_shdoc' "${action_path?}/shdoc"
+        mv -f 'external_files_shdoc' "${action_path?}/shdoc"
         init_dir="$(pwd)"
-        cd "external_files_shdoc" #######################
-        #cd "${action_path?}/shdoc"
+        cd "${action_path?}/shdoc"
         make install
         cd "${init_dir?}"
     - name: "Execute shdoc"
@@ -39,12 +38,12 @@ runs:
       run: |
         # Executing shdoc...
         action_path="${{ github.action_path }}"
+        mkdir -p "${action_path}/docs"
         hash gawk shdoc
-        mkdir -p "${action_path}/documentation"
 
         scan_files()
         {
-          count='0'
+          count='1'
           set -o pipefail
           while read -r FILE; do
             echo '################################################################################'
@@ -52,13 +51,16 @@ runs:
 
             if expr "$FILE_LOWER" : '^.*\.\(sh\|ash\|dash\|ksh\|bash\|bats\)$' 1>/dev/null || test '#!' = "$(head -c 2 "$FILE")"; then
               echo "Currently scanning: $FILE"
-              count="$((count+1))"
-              shdoc < "$FILE" > "${action_path}/documentation/${count}.md"; STATUS="$?"
-
-              cat "${action_path}/documentation/${count}.md" | tr -d '\r\n' > "${action_path}/test.md"
-              if ! test -s "${action_path}/test.md"; then echo "Empty documentation"; rm -f "${action_path}/documentation/${count}.md"; fi
-              rm -f "${action_path}/test.md"
+              shdoc < "$FILE" > "${action_path}/docs/${count}.md"; STATUS="$?"
               if test "${STATUS}" -ne 0; then echo "Error"; return 1; fi
+
+              cat "${action_path}/docs/${count}.md" | tr -d '\r\n' > "${action_path}/test.md"
+              if test -s "${action_path}/test.md"; then 
+                ((count++))
+              else
+                echo "Empty documentation"; rm -f "${action_path}/docs/${count}.md"
+              fi
+              rm -f "${action_path}/test.md"
             else
               echo "Skipped: $FILE"
             fi
@@ -75,4 +77,4 @@ runs:
     - uses: actions/upload-artifact@v2
       with:
         name: "Documentation"
-        path: "${{ github.action_path }}/documentation/"
+        path: "${{ github.action_path }}/docs/"
