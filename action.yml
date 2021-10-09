@@ -6,9 +6,6 @@
 name: "TEST"
 author: "ale5000"
 description: "GitHub action to create documentation of all shell scripts using shdoc."
-branding:
-  #icon: "check-circle"
-  color: "green"
 
 inputs:
   shdoc-version:
@@ -22,19 +19,25 @@ runs:
       uses: actions/checkout@v2
       with:
         repository: "reconquest/shdoc"
-        path: "external_files/shdoc_src"
+        path: "external_files_shdoc"
         submodules: "true"
     - name: "Compile shdoc"
       shell: bash
       run: |
         # Compiling shdoc...
+        action_path="${{ github.action_path }}"
+        rm -rf "${action_path?}/shdoc"
+        mv -r 'external_files_shdoc' "${action_path?}/shdoc"
+        init_dir="$(pwd)"
+
         echo '--------------------------'
         ls -A .
         echo '--------------------------'
-        cd external_files/shdoc_src
+
+        cd "${action_path?}/shdoc"
         make install
-        cd ../..
-        rm -rf external_files
+        cd "${init_dir?}"
+
         echo '--------------------------'
         ls -A .
         echo '--------------------------'
@@ -43,6 +46,9 @@ runs:
       shell: bash {0}
       run: |
         # Executing shdoc...
+        echo '--------------------------'
+        ls -A .
+        echo '--------------------------'
         action_path="${{ github.action_path }}"
         hash gawk shdoc
         mkdir -p "${action_path}/documentation"
