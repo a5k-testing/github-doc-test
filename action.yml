@@ -67,7 +67,7 @@ runs:
               shdoc < "$FILE" > "${action_path}/documentation/${count}.md"; STATUS="$?"
 
               cat "${action_path}/documentation/${count}.md" | tr -d '\r\n' > "${action_path}/test.md"
-              if test -s "${action_path}/test.md"; then echo "Empty file"; rm -f "${action_path}/documentation/${count}.md"; fi
+              if ! test -s "${action_path}/test.md"; then echo "Empty documentation"; rm -f "${action_path}/documentation/${count}.md"; fi
               rm -f "${action_path}/test.md"
               if test "${STATUS}" -ne 0; then echo "Error"; return 1; fi
             else
