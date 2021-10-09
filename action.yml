@@ -30,7 +30,7 @@ runs:
         mv -f 'external_files_shdoc' "${action_path?}/shdoc"
         init_dir="$(pwd)"
         cd "${action_path?}/shdoc"
-        make install
+        make install 1>&-
         cd "${init_dir?}"
     - name: "Execute shdoc"
       id: "shellcheck-scan"
