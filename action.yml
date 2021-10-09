@@ -27,7 +27,7 @@ runs:
         # Compiling shdoc...
         action_path="${{ github.action_path }}"
         rm -rf "${action_path?}/shdoc"
-        mv -r 'external_files_shdoc' "${action_path?}/shdoc"
+        mv -f 'external_files_shdoc' "${action_path?}/shdoc"
         init_dir="$(pwd)"
 
         echo '--------------------------'
