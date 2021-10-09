@@ -84,4 +84,4 @@ runs:
     - uses: actions/upload-artifact@v2
       with:
         name: "Documentation"
-        path: "documentation/"
+        path: "${{ github.action_path }}/documentation/"
