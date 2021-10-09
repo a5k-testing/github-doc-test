@@ -28,9 +28,11 @@ runs:
       shell: bash
       run: |
         # Compiling shdoc...
+        ls .
         cd shdoc_src
         make install
         cd ..
+        ls .
         rm -rf shdoc_src
         hash gawk shdoc
         mkdir -p documentation
