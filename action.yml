@@ -33,7 +33,7 @@ runs:
         echo '--------------------------'
         cd external_files/shdoc_src
         make install
-        cd ..
+        cd ../..
         echo '--------------------------'
         ls -A .
         echo '--------------------------'
@@ -42,9 +42,6 @@ runs:
         ls -A .
         echo '--------------------------'
         hash gawk shdoc
-        mkdir -p documentation
-        shdoc < ./TEST.sh > ./documentation/doc.md
-
     - name: "Execute shdoc"
       id: "shellcheck-scan"
       shell: bash {0}
