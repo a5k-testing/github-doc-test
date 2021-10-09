@@ -1,0 +1,81 @@
+---
+# SPDX-FileCopyrightText: Copyright (C) 2021 ale5000
+# SPDX-License-Identifer: LGPL-3.0-or-later
+# SPDX-FileType: SOURCE
+
+name: "TEST"
+author: "ale5000"
+description: "GitHub action to create documentation of all shell scripts using shdoc."
+branding:
+  #icon: "check-circle"
+  color: "green"
+
+inputs:
+  shdoc-version:
+    description: "Version to use. Values: [git]"
+    required: false
+    default: "git"
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout Documentation generator"
+      uses: actions/checkout@v2
+      with:
+        repository: "reconquest/shdoc"
+        path: "shdoc_src"
+        submodules: "true"
+    - name: "Compile shdoc"
+      shell: bash
+      run: |
+        # Compiling shdoc...
+        cd shdoc_src
+        make install
+        cd ..
+        rm -rf shdoc_src
+        hash gawk shdoc
+        mkdir -p documentation
+        shdoc < ./TEST.sh > ./documentation/doc.md
+
+    - name: "Execute shdoc"
+      id: "shellcheck-scan"
+      shell: bash {0}
+      run: |
+        # Executing shdoc...
+        action_path="${{ github.action_path }}"
+        hash gawk shdoc
+        mkdir -p "${action_path}/documentation"
+
+        scan_files()
+        {
+          count='0'
+          set -o pipefail
+          while read -r FILE; do
+            echo '################################################################################'
+            FILE_LOWER="$(echo "${FILE}" | tr '[:upper:]' '[:lower:]')"
+
+            if expr "$FILE_LOWER" : '^.*\.\(sh\|ash\|dash\|ksh\|bash\|bats\)$' 1>/dev/null || test '#!' = "$(head -c 2 "$FILE")"; then
+              echo "Currently scanning: $FILE"
+              count="$((count+1))"
+              if test "${{ runner.os }}" = 'Windows'; then
+                shdoc < "$FILE" > "${action_path}/documentation/${count}.md" | tr -d '\r'; STATUS="$?"
+              else
+                shdoc < "$FILE" > "${action_path}/documentation/${count}.md"; STATUS="$?"
+              fi
+              if test "${STATUS}" -ne 0; then echo "Error"; return 1; fi
+            else
+              echo "Skipped: $FILE"
+            fi
+          done
+
+          return 0
+        }
+        find '.' -type f \! -path './.git/*' | LC_ALL=C sort | scan_files; num_files_with_issues="$?"
+
+        printf '################################################################################\n\n'
+        if test "${num_files_with_issues}" -gt '0'; then result_icon="🐛"; else result_icon="✅"; fi
+        echo "::notice::[ShellChecker] NUMBER OF FILES WITH ISSUES: ${num_files_with_issues} ${result_icon}"
+        if test "${num_files_with_issues}" -gt '0'; then exit '1'; else printf "\033[32mAll is good!\n"; fi
+    - uses: actions/upload-artifact@v2
+      with:
+        name: "Documentation"
+        path: "documentation/"
