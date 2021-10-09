@@ -34,14 +34,10 @@ runs:
         cd external_files/shdoc_src
         make install
         cd ../..
-        echo '--------------------------'
-        ls -A .
-        echo '--------------------------'
         rm -rf external_files
         echo '--------------------------'
         ls -A .
         echo '--------------------------'
-        hash gawk shdoc
     - name: "Execute shdoc"
       id: "shellcheck-scan"
       shell: bash {0}
