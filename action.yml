@@ -22,7 +22,7 @@ runs:
       uses: actions/checkout@v2
       with:
         repository: "reconquest/shdoc"
-        path: "shdoc_src"
+        path: "external_files/shdoc_src"
         submodules: "true"
     - name: "Compile shdoc"
       shell: bash
@@ -31,13 +31,16 @@ runs:
         echo '--------------------------'
         ls -A .
         echo '--------------------------'
-        cd shdoc_src
+        cd external_files/shdoc_src
         make install
         cd ..
         echo '--------------------------'
         ls -A .
         echo '--------------------------'
-        rm -rf shdoc_src
+        rm -rf external_files
+        echo '--------------------------'
+        ls -A .
+        echo '--------------------------'
         hash gawk shdoc
         mkdir -p documentation
         shdoc < ./TEST.sh > ./documentation/doc.md
