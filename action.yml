@@ -33,7 +33,7 @@ runs:
         mv -f 'external_files_shdoc' "${action_path?}/shdoc_src"; echo 2
         init_dir="$(pwd)"
         cd "${action_path?}/shdoc_src"; echo 3
-        make install 1>&-; echo 4
+        make install; echo 4
         cd "${init_dir?}"
         rm -rf "${action_path?}/shdoc_src"; echo 5
 
