@@ -26,6 +26,9 @@ runs:
       run: |
         # Compiling shdoc...
         action_path="${{ github.action_path }}"
+        echo '---------------------------'
+        ls "${action_path?}"
+        echo '---------------------------'
         rm -rf "${action_path?}/shdoc_src"
         mv -f 'external_files_shdoc' "${action_path?}/shdoc_src"
         init_dir="$(pwd)"
@@ -34,7 +37,9 @@ runs:
         cd "${init_dir?}"
         rm -rf "${action_path?}/shdoc_src"
 
+        echo '---------------------------'
         ls "${action_path?}"
+        echo '---------------------------'
     - name: "Execute shdoc"
       id: "shellcheck-scan"
       shell: bash {0}
