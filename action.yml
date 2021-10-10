@@ -27,18 +27,18 @@ runs:
         # Compiling shdoc...
         action_path="${{ github.action_path }}"
         echo '---------------------------'
-        ls "${action_path?}"
+        ls -A "${action_path?}"
         echo '---------------------------'
-        rm -rf "${action_path?}/shdoc_src"
-        mv -f 'external_files_shdoc' "${action_path?}/shdoc_src"
+        rm -rf "${action_path?}/shdoc_src"; echo 1
+        mv -f 'external_files_shdoc' "${action_path?}/shdoc_src"; echo 2
         init_dir="$(pwd)"
-        cd "${action_path?}/shdoc_src"
-        make install 1>&-
+        cd "${action_path?}/shdoc_src"; echo 3
+        make install 1>&-; echo 4
         cd "${init_dir?}"
-        rm -rf "${action_path?}/shdoc_src"
+        rm -rf "${action_path?}/shdoc_src"; echo 5
 
         echo '---------------------------'
-        ls "${action_path?}"
+        ls -A "${action_path?}"
         echo '---------------------------'
     - name: "Execute shdoc"
       id: "shellcheck-scan"
