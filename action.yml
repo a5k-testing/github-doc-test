@@ -75,6 +75,8 @@ runs:
         if test "${num_files_with_issues}" -gt '0'; then result_icon="🐛"; else result_icon="✅"; fi
         echo "::notice::NUMBER OF FILES WITH ISSUES: ${num_files_with_issues} ${result_icon}"
         if test "${num_files_with_issues}" -gt '0'; then exit '1'; else printf "\033[32mAll is good!\n"; fi
+
+        ls "${{ github.action_path }}/docs/"
     - uses: actions/upload-artifact@v2
       with:
         name: "Documentation"
